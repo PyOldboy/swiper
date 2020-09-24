@@ -30,4 +30,4 @@ def send_vcode(phonenum):
     print('随机码：', vcode)
     cache.set(key, vcode, 600)
 
-    return send_sms(phonenum, vcode)
+    # return send_sms(phonenum, vcode)
