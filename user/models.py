@@ -24,6 +24,13 @@ class User(models.Model):
     avatar = models.CharField(max_length=256, verbose_name='个人形象')
     location = models.CharField(max_length=10, choices=LOCATIONS, default='上海', verbose_name='常居地')
 
+    @property
+    def profile(self):
+        '''当前用户对应的 Profile'''
+        if not hasattr(self, '_profile'):
+            self._profile, _ = Profile.objects.get_or_create(id=self.id)
+        return self._profile
+
     def to_dict(self):
         return {
             'id': self.id,
