@@ -1,9 +1,10 @@
 import random
 import re
 
-from django.core.cache import cache
-
-from lib.sms import send_sms
+from common import keys
+from libs.cache import rds
+from libs.sms import send_sms
+from tasks import celery_app
 
 
 def is_phonenum(phonenum):
@@ -17,17 +18,18 @@ def random_code(length=6):
     nums = [str(random.randint(0,9)) for i in range(length)]
     return ''.join(nums)
 
+@celery_app.task
 def send_vcode(phonenum):
     if not is_phonenum(phonenum):
         return False
 
-    key = 'Vcode-%s' % phonenum
-    if cache.get(key):
+    key = keys.VCODE_K % phonenum
+    if rds.get(key):
         return True
 
     # 产生验证码
     vcode = random_code()
     print('随机码：', vcode)
-    cache.set(key, vcode, 600)
+    rds.set(key, vcode, 600)
 
-    return send_sms(phonenum, vcode)
+    # return send_sms(phonenum, vcode)
