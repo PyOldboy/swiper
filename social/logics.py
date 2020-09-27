@@ -1,5 +1,7 @@
 import datetime
 
+from common import keys
+from libs.cache import rds
 from user.models import User
 from user.models import Profile
 from social.models import Swiped, Friend
@@ -35,10 +37,28 @@ def like_someone(uid, sid):
     Swiped.objects.create(uid=uid, sid=sid, stype='like')
 
     # 检查对方是否喜欢(右滑或上滑)过自己
-    is_liked = Swiped.objects.filter(uid=sid, sid=uid, stype__in=['like', 'superlike']).exists()
-    if is_liked:
+    if Swiped.is_liked(sid, uid):
         # 将互相喜欢的两人添加成好友
         Friend.make_friends(uid, sid)
         return True
     else:
         return False
+
+
+def superlike_someone(uid, sid):
+    '''超级喜欢某人 (上滑)'''
+
+    # 添加滑动记录
+    Swiped.objects.create(uid=uid, sid=sid, stype='superlike')
+
+    # 检查对方是否喜欢(右滑或上滑)过自己
+    liked = Swiped.is_liked(sid, uid)
+    if liked is True:
+        # 将互相喜欢的两人添加成好友
+        Friend.make_friends(uid, sid)
+        return True
+    elif liked is False:
+        return False
+    else:
+        # 对方尚未滑到过自己，把自己推荐给对方
+        rds.rpush(keys.FIRST_RCMD_Q % sid, uid)

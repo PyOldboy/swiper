@@ -19,6 +19,17 @@ class Swiped(models.Model):
     class Meta:
         unique_together = ['uid', 'sid']
 
+    @classmethod
+    def is_liked(cls, uid, sid):
+        # 检查是否喜欢过某人
+        swiped = Swiped.objects.filter(uid=uid, sid=sid).first()
+        if not swiped:
+            return None  # 用户尚未滑到 sid
+        elif swiped.stype in ['like', 'superlike']:
+            return True  # 喜欢过
+        else:
+            return False  # 不喜欢
+
 
 class Friend(models.Model):
     uid1 = models.IntegerField(verbose_name='UID 1')
@@ -30,5 +41,5 @@ class Friend(models.Model):
     @classmethod
     def make_friends(cls, uid1, uid2):
         '''创建好友关系'''
-        uid1, uid2 = (uid2, uid1) if uid1 > uid2 else (uid1, uid2) # 调整两者位置
+        uid1, uid2 = (uid2, uid1) if uid1 > uid2 else (uid1, uid2)  # 调整两者位置
         cls.objects.create(uid1=uid1, uid2=uid2)
