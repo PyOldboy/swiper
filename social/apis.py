@@ -11,8 +11,10 @@ def rcmd_users(request):
 
 
 def like(request):
-    '''喜欢 (左滑)'''
-    return render_json()
+    '''喜欢 (右滑)'''
+    sid = int(request.POST.get('sid'))
+    matched = logics.like_someone(request.uid, sid)
+    return render_json({'is_matched': matched})
 
 
 
@@ -23,7 +25,7 @@ def superlike(request):
 
 
 def dislike(request):
-    '''不喜欢 (右滑)'''
+    '''不喜欢 (左滑)'''
     return render_json()
 
 
