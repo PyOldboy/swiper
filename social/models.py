@@ -1,7 +1,8 @@
-from django.db import models
-
+from django.db import models, IntegrityError
 
 # Create your models here.
+from common import errors
+
 
 class Swiped(models.Model):
     '''滑动记录表'''
@@ -18,6 +19,14 @@ class Swiped(models.Model):
 
     class Meta:
         unique_together = ['uid', 'sid']
+
+    @classmethod
+    def swipe(cls, uid, sid, stype):
+        try:
+            cls.objects.create(uid=uid, sid=sid, stype=stype)
+        except IntegrityError:
+            # 跑出重复滑动异常
+            raise errors.RepeatSwipeErr
 
     @classmethod
     def is_liked(cls, uid, sid):

@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 
 # Create your views here.
 from common import errors, keys
@@ -36,7 +35,7 @@ def submit_vcode(request):
         return render_json(user.to_dict())
 
     else:
-        return render_json(data='验证码错误', code=errors.VCODE_ERR)
+        raise errors.VcodeErr('验证码错误')
 
 
 def show_profile(request):
@@ -62,8 +61,7 @@ def update_profile(request):
         err = {}
         err.update(user_form.errors)
         err.update(profile_form.errors)
-        return render_json(data=err, code=errors.PROFILE_ERR)
-
+        raise errors.ProfileErr(data=err)
 
 def qn_token(request):
     uid = request.session['uid']

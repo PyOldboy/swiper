@@ -32,8 +32,6 @@ def rcmd_from_db(uid, num=20):
         birthday__range=[earliest_birth, latest_birth],
     ).exclude(id__in=sid_list)[:num]  # 懒加载
 
-    # TODO：排除已经滑过的人
-
     return users
 
 
@@ -88,3 +86,12 @@ def superlike_someone(uid, sid):
         # 对方尚未滑到过自己，把自己推荐给对方
         rds.rpush(keys.FIRST_RCMD_Q % sid, uid)
         return False
+
+
+def dislike_someone(uid, sid):
+    '''不喜欢某人（左滑）'''
+    # 添加滑动记录
+    Swiped.objects.create(uid=uid, sid=sid, stype='dislike')
+
+    # 强制删除优先推荐队列中的 sid
+    rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)

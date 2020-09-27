@@ -28,6 +28,8 @@ def superlike(request):
 
 def dislike(request):
     '''不喜欢 (左滑)'''
+    sid = int(request.POST.get('sid'))
+    logics.dislike_someone(request.uid, sid)
     return render_json()
 
 

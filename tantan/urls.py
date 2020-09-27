@@ -30,11 +30,11 @@ urlpatterns = [
     path('qiniu/callback', user_api.qn_callback),
 
     #Social 模块接口
-    path('api/social', social_api.rcmd_users),
-    path('api/social', social_api.like),
-    path('api/social', social_api.superlike),
-    path('api/social', social_api.dislike),
-    path('api/social', social_api.rewind),
-    path('api/social', social_api.show_fans),
-    path('api/social', social_api.show_friends),
+    path('api/social/rcmd', social_api.rcmd_users),
+    path('api/social/like', social_api.like),
+    path('api/social/superlike', social_api.superlike),
+    path('api/social/dislike', social_api.dislike),
+    path('api/social/rewind', social_api.rewind),
+    path('api/social/fans', social_api.show_fans),
+    path('api/social/friends', social_api.show_friends),
 ]
