@@ -1,6 +1,7 @@
 import random
 import re
 
+from common import keys
 from libs.cache import rds
 from libs.sms import send_sms
 from tasks import celery_app
@@ -22,7 +23,7 @@ def send_vcode(phonenum):
     if not is_phonenum(phonenum):
         return False
 
-    key = 'Vcode-%s' % phonenum
+    key = keys.VCODE_K % phonenum
     if rds.get(key):
         return True
 

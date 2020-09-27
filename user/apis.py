@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 
 # Create your views here.
-from common import errors
+from common import errors, keys
 from libs.http import render_json
 from libs.cache import rds
 from libs.qn_cloud import gen_token, get_res_url
@@ -23,7 +23,7 @@ def submit_vcode(request):
     phonenum = request.POST.get('phonenum')
     vcode = request.POST.get('vcode')
 
-    key = 'Vcode-%s' % phonenum
+    key = keys.VCODE_K % phonenum
     cached_vcode = rds.get(key)
 
     if vcode and vcode == cached_vcode:
@@ -43,7 +43,7 @@ def show_profile(request):
     uid = request.session['uid']
     profile, _ = Profile.objects.get_or_create(id=uid)
 
-    # profile_serializer = ASerializer(profile)
+    # profile_serializer = ASerializer(social)
 
     return render_json(ASerializer(profile).data)
 

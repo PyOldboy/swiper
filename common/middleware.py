@@ -16,3 +16,5 @@ class AuthMiddleware(MiddlewareMixin):
         uid = request.session.get('uid')
         if not uid:
             return JsonResponse({'code': 1002, 'data': '用户未登录'})
+        else:
+            request.uid = uid
