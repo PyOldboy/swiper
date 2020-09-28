@@ -10,7 +10,7 @@ base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(base_dir)
 
 # 第二步：设置环境变量 DJANGO_SETTINGS_MODULE
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swiper.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tantan.settings')
 
 # 第三步：Django 环境初始化
 django.setup()
@@ -76,4 +76,19 @@ def create_robots(n):
         except django.db.utils.IntegrityError:
             pass
 
+
+if __name__ == '__main__':
+    # 解析脚本执行的参数
+    if len(sys.argv) >= 2:
+        command = sys.argv[1]
+        if command == 'create_robots':
+            create_robots(1000)
+        # elif command == 'create_vip':
+        #     create_vip_data()
+        else:
+            print('未知的命令')
+            sys.exit(2)
+    else:
+        create_robots(1000)
+        # create_vip_data()
 

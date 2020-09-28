@@ -1,7 +1,10 @@
-from django.db import models
-
+from django.db import models, IntegrityError
 
 # Create your models here.
+from django.db.models import Q
+
+from common import errors
+
 
 class Swiped(models.Model):
     '''滑动记录表'''
@@ -18,6 +21,14 @@ class Swiped(models.Model):
 
     class Meta:
         unique_together = ['uid', 'sid']
+
+    @classmethod
+    def swipe(cls, uid, sid, stype):
+        try:
+            cls.objects.create(uid=uid, sid=sid, stype=stype)
+        except IntegrityError:
+            # 跑出重复滑动异常
+            raise errors.RepeatSwipeErr
 
     @classmethod
     def is_liked(cls, uid, sid):
@@ -43,3 +54,23 @@ class Friend(models.Model):
         '''创建好友关系'''
         uid1, uid2 = (uid2, uid1) if uid1 > uid2 else (uid1, uid2)  # 调整两者位置
         cls.objects.create(uid1=uid1, uid2=uid2)
+
+    @classmethod
+    def breakoff(cls, uid1, uid2):
+        '''删除好友关系'''
+        uid1, uid2 = (uid2, uid1) if uid1 > uid2 else (uid1, uid2)  # 调整两者位置
+        cls.objects.filter(uid1=uid1, uid2=uid2).delete()
+
+    @classmethod
+    def friend_ids(cls, uid):
+        '''查看自己的所有好友 ID'''
+        uid_list = []
+        condition = Q(uid1=uid) | Q(uid2=uid)
+        for frd in cls.objects.filter(condition):
+            if frd.uid1 == uid:
+                uid_list.append(frd.uid2)
+            else:
+                uid_list.append(frd.uid1)
+
+        return uid_list
+
