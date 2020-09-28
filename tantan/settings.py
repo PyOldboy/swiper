@@ -32,8 +32,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
+  
+    'vip',
     'social',
-    'user'
+    'user',
+
 ]
 
 MIDDLEWARE = [
@@ -119,3 +122,4 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
