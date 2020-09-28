@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class SocialConfig(AppConfig):
-    name = 'profile'
+    name = 'social'
