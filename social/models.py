@@ -1,6 +1,8 @@
 from django.db import models, IntegrityError
 
 # Create your models here.
+from django.db.models import Q
+
 from common import errors
 
 
@@ -52,3 +54,23 @@ class Friend(models.Model):
         '''创建好友关系'''
         uid1, uid2 = (uid2, uid1) if uid1 > uid2 else (uid1, uid2)  # 调整两者位置
         cls.objects.create(uid1=uid1, uid2=uid2)
+
+    @classmethod
+    def breakoff(cls, uid1, uid2):
+        '''删除好友关系'''
+        uid1, uid2 = (uid2, uid1) if uid1 > uid2 else (uid1, uid2)  # 调整两者位置
+        cls.objects.filter(uid1=uid1, uid2=uid2).delete()
+
+    @classmethod
+    def friend_ids(cls, uid):
+        '''查看自己的所有好友 ID'''
+        uid_list = []
+        condition = Q(uid1=uid) | Q(uid2=uid)
+        for frd in cls.objects.filter(condition):
+            if frd.uid1 == uid:
+                uid_list.append(frd.uid2)
+            else:
+                uid_list.append(frd.uid1)
+
+        return uid_list
+
