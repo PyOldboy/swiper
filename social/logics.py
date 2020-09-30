@@ -119,18 +119,19 @@ def rewind_last_swipe(uid):
     if time_past >= config.REWIND_TIMEOUT:
         raise errors.RewindTimeout
 
-    if last_swipe.stype in ['like', 'superlike']:
-        # 如果之前匹配成了好友，则删除好友关系
-        Friend.breakoff(uid, last_swipe.sid)
-        # 如果上一次是超级喜欢，则删除优先推荐队列中的数据
-        if last_swipe.stype == 'superlike':
-            rds.lrem(keys.FIRST_RCMD_Q % last_swipe.sid, 0, uid)
+    with atomic(): # 将多次数据修改在事务中执行
+        if last_swipe.stype in ['like', 'superlike']:
+            # 如果之前匹配成了好友，则删除好友关系
+            Friend.breakoff(uid, last_swipe.sid)
+            # 如果上一次是超级喜欢，则删除优先推荐队列中的数据
+            if last_swipe.stype == 'superlike':
+                rds.lrem(keys.FIRST_RCMD_Q % last_swipe.sid, 0, uid)
 
-    # 删除最后一次的滑动
-    last_swipe.delete()
+        # 删除最后一次的滑动
+        last_swipe.delete()
 
-    # 今日反悔次数加一
-    rds.set(rewind_key, rewind_times + 1, 86460)
+        # 今日反悔次数加一
+        rds.set(rewind_key, rewind_times + 1, 86460) # 缓存过期时间为一天零60秒
 
 def find_my_fans(uid):
     '''查找我的粉丝'''

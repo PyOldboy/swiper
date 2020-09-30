@@ -1,10 +1,13 @@
 import random
 import re
+import logging
 
 from common import keys
 from libs.cache import rds
 from libs.sms import send_sms
 from tasks import celery_app
+
+inf_log = logging.getLogger('inf')
 
 
 def is_phonenum(phonenum):
@@ -30,6 +33,7 @@ def send_vcode(phonenum):
     # 产生验证码
     vcode = random_code()
     print('随机码：', vcode)
+    inf_log.debug(f'验证码：{phonenum}-{vcode}')
     rds.set(key, vcode, 600)
 
     # return send_sms(phonenum, vcode)

@@ -10,9 +10,16 @@ class Vip(models.Model):
     duration = models.IntegerField(verbose_name='会员时长')
     price = models.FloatField(verbose_name='会员价格')
 
+    def has_perm(self, perm_name):
+        '''检查会员是否拥有某权限'''
+        perm = Permission.objects.get(name=perm_name)
+        return VipPermRelation.objects.filter(vip_level=self.level, perm_id=perm.id).exists()
+
+
+
 class Permission(models.Model):
     '''权限表'''
-    name = models.CharField(max_length=20, verbose_name='权限名称')
+    name = models.CharField(max_length=20, unique=True, verbose_name='权限名称')
     description = models.TextField(verbose_name='权限描述')
 
 

@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # Django stuff:
+logs/
 *.log
 local_settings.py
 db.sqlite3

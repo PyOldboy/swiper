@@ -1,5 +1,5 @@
+import logging
 
-# Create your views here.
 from common import errors, keys
 from libs.http import render_json
 from libs.cache import rds
@@ -9,6 +9,7 @@ from user.logics import send_vcode
 from user.models import User, Profile
 from user.serializers import ASerializer
 
+inf_log = logging.getLogger('inf')
 
 def fetch_vcode(request):
     '''给用户发送验证码'''
@@ -28,8 +29,10 @@ def submit_vcode(request):
     if vcode and vcode == cached_vcode:
         try:
             user = User.objects.get(phonenum=phonenum)
+            inf_log.info(f'User Login: {user.id} / {user.phonenum}')
         except User.DoesNotExist:
             user = User.objects.create(phonenum=phonenum, nickname=phonenum)
+            inf_log.info(f'User Register: {user.id} / {user.phonenum}')
 
         request.session['uid'] = user.id
         return render_json(user.to_dict())
