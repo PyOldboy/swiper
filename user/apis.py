@@ -42,8 +42,18 @@ def submit_vcode(request):
 
 
 def show_profile(request):
+    """查看个人资料"""
     uid = request.session['uid']
-    profile, _ = Profile.objects.get_or_create(id=uid)
+    key = keys.PROFILE_K % uid
+
+    profile = rds.get(key)
+    inf_log.debug(f'从数据库中获取数据：{profile}')
+
+    if profile is None:
+        profile, _ = Profile.objects.get_or_create(id=uid)
+        inf_log.debug(f'从数据库中获取数据：{profile}')
+        rds.set(key, profile)
+        inf_log.debug('将数据写入到缓存')
 
     # profile_serializer = ASerializer(social)
 
@@ -51,14 +61,21 @@ def show_profile(request):
 
 
 def update_profile(request):
+    """更新个人资料"""
+    # 定义 form 对象
     user_form = UserForm(request.POST)
     profile_form = ProfileForm(request.POST)
 
+    # 检查验证数据
     if user_form.is_valid() and profile_form.is_valid():
         uid = request.session['uid']
 
         User.objects.filter(id=uid).update(**user_form.cleaned_data)
         Profile.objects.update_or_create(id=uid, defaults=profile_form.cleaned_data)
+
+        inf_log.debug('删除旧缓存')
+        rds.delete(keys.PROFILE_K % uid)
+        
         return render_json()
     else:
         err = {}

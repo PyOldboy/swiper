@@ -52,7 +52,7 @@ ROOT_URLCONF = 'tantan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
+        'DIRS': [os.path.join(BASE_DIR, 'static')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
