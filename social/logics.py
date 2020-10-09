@@ -59,6 +59,9 @@ def like_someone(uid, sid):
     # 强制删除优先推荐队列中的 sid
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
 
+    # 给被滑动者增加滑动积分
+    rds.zincrby(keys.HOT_RANK, config.SWIPE_SCORE['like'], sid)
+
     # 检查对方是否喜欢(右滑或上滑)过自己
     if Swiped.is_liked(sid, uid):
         # 将互相喜欢的两人添加成好友
@@ -77,6 +80,9 @@ def superlike_someone(uid, sid):
 
     # 强制删除优先推荐队列中的 sid
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
+
+    # 给被滑动者增加滑动积分
+    rds.zincrby(keys.HOT_RANK, config.SWIPE_SCORE['superlike'], sid)
 
     # 检查对方是否喜欢(右滑或上滑)过自己
     liked = Swiped.is_liked(sid, uid)
@@ -99,6 +105,9 @@ def dislike_someone(uid, sid):
 
     # 强制删除优先推荐队列中的 sid
     rds.lrem(keys.FIRST_RCMD_Q % uid, count=0, value=sid)
+
+    # 给被滑动者增加滑动积分
+    rds.zincrby(keys.HOT_RANK, config.SWIPE_SCORE['dislike'], sid)
 
 
 def rewind_last_swipe(uid):
@@ -127,6 +136,10 @@ def rewind_last_swipe(uid):
             if last_swipe.stype == 'superlike':
                 rds.lrem(keys.FIRST_RCMD_Q % last_swipe.sid, 0, uid)
 
+        # 撤销被滑动者改变的积分
+        score = config.SWIPE_SCORE[last_swipe.stype]
+        rds.zincrby(keys.HOT_RANK, -score, last_swipe.sid)
+
         # 删除最后一次的滑动
         last_swipe.delete()
 
@@ -144,4 +157,27 @@ def find_my_fans(uid):
 
     users = User.objects.filter(id__in=fans_id_list)
     return users
+
+def get_top_n(num):
+    """获取排行榜前 N 的用户数据"""
+    origin_rank = rds.zrevrange(keys.HOT_RANK, 0, num - 1, withscores=True)  # 从 Redis 中取出前 N 的原始数据
+    cleaned_rank = [[int(uid), int(score)] for uid, score in origin_rank] # 将原始数据中的每一项强转成int
+
+    # 取出前 N 个用户
+    uid_list = [uid for uid, _ in cleaned_rank] # 用户的 ID 列表
+    users = User.objects.filter(id__in=uid_list)
+    users = sorted(users, key=lambda user: uid_list.index(user.id))
+
+    # 整理用户数据
+    rank_data = []
+    for index, (uid ,score) in enumerate(cleaned_rank):
+        rank = index + 1
+        user = users[index]
+        user_data = user.to_dict(exclude=['phonenum', 'birthday', 'location',
+                                          'vip_id', 'vip_expire'])
+        user_data['rank'] = rank
+        user_data['score'] = score
+        rank_data.append(user_data)
+
+    return rank_data
 

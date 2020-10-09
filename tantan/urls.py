@@ -38,4 +38,5 @@ path('', views.index),
     path('api/social/rewind', social_api.rewind),
     path('api/social/fans', social_api.show_fans),
     path('api/social/friends', social_api.show_friends),
+    path('api/social/rank', social_api.hot_rank),
 ]

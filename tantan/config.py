@@ -7,9 +7,18 @@ REDIS = {
     'db': 2,
 }
 
+# 滑动积分
+SWIPE_SCORE = {
+    'like': 5,
+    'superlike': 7,
+    'dislike': -5
+}
+
+# 排行榜数量
+RANK_NUM = 50
+
 
 # 云之讯通信设置
-
 YUN_SID = '4e43ef436406a81cc297291b9633029a'
 YUN_TOKEN = '6c7fcf77b31128cebf3187ef0b39583d'
 YUN_APPID = 'e35c50827a4e45429672b15188076d0a'

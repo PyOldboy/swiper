@@ -41,7 +41,7 @@ class User(models.Model):
 
     @property
     def vip(self):
-        '''当前用户对应的 VIP'''
+        """当前用户对应的 VIP"""
         # 检查当前会员是否过期
         now = datetime.datetime.now()
         if now >= self.vip_expire:
@@ -59,16 +59,6 @@ class User(models.Model):
         self._vip = vip
         self.save()
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'phonenum': self.phonenum,
-            'nickname': self.nickname,
-            'gender': self.gender,
-            'birthday': str(self.birthday),
-            'avatar': self.avatar,
-            'location': self.location,
-        }
 
 
 class Profile(models.Model):

@@ -7,3 +7,4 @@ REWIND_TIMES_K = 'RewindTimes-%s-%s'  # 每日反悔次数，拼接日期和uid
 
 PROFILE_K = 'Profile-%s'  # 用户交友资料的 Key，拼接 Profile.id
 MODEL_K = 'Model-%s-%s'  # 模型缓存的 Key，拼接 Model 名 和 对象的主键
+HOT_RANK = 'HotRank'   # 热度排行榜的 Key
