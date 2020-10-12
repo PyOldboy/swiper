@@ -34,17 +34,21 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
-    'vip',
-    'social',
+
     'user',
+    'social',
+    'vip'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'common.middleware.AuthMiddleware',  # 登录验证中间件
+    'common.middleware.LogicErrMiddleware',  # 逻辑异常中间件
 ]
 
 ROOT_URLCONF = 'tantan.urls'
@@ -52,8 +56,7 @@ ROOT_URLCONF = 'tantan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'static')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'static')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

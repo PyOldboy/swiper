@@ -7,7 +7,6 @@ from libs.qn_cloud import gen_token, get_res_url
 from user.forms import UserForm, ProfileForm
 from user.logics import send_vcode
 from user.models import User, Profile
-from user.serializers import ASerializer
 
 inf_log = logging.getLogger('inf')
 
@@ -55,9 +54,7 @@ def show_profile(request):
         rds.set(key, profile)
         inf_log.debug('将数据写入到缓存')
 
-    # profile_serializer = ASerializer(social)
-
-    return render_json(ASerializer(profile).data)
+    return render_json(profile.to_dict())
 
 
 def update_profile(request):
